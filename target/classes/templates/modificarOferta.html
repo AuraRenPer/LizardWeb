@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+        <title>Modificar Oferta</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+        <style>
+            body {
+                background-color: #f8f9fa;
+                font-family: 'Arial', sans-serif;
+            }
+
+            .container-form {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                height: 60vh;
+            }
+
+            .form-container {
+                max-width: 900px;
+                width: 90%;
+                padding: 20px;
+                background-color: #ffffff;
+                border: 2px solid #ced4da;
+                border-radius: 10px;
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+                opacity: 0.95;
+                margin-top: 150px;
+            }
+
+            .table-header {
+                background-color: #343a40 !important; /* Encabezado de la tabla - gris oscuro */
+                color: #ffffff; /* Texto blanco en el encabezado */
+            }
+
+            .form-label {
+                margin-top: 10px;
+                font-size: 18px;
+            }
+
+            .form-check-label {
+                margin-bottom: 10px;
+                font-size: 16px;
+                opacity: 0.7;
+            }
+
+            .btn-container {
+                text-align: center;
+                margin-top: 20px;
+            }
+
+            .btn-save {
+                font-size: 16px;
+            }
+
+            .btn-success {
+                background-color: #34B912; /* Botones de color verde */
+                border-color: #34B912;
+            }
+        </style>
+    </head>
+
+    <div data-th-replace="~{layout/layout :: encabezado}"></div>
+    <div class="container">
+        <h1 class="text-center">Editar oferta</h1>
+        <a href="ofertaeducativa.html" data-th-href="@{/ofertaeducativa}" class="btn btn-danger">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-left" viewBox="0 0 16 16">
+            <path fill-rule="evenodd" d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8"/>
+            </svg>
+            Regresar
+        </a>
+        <p></p>
+        <form id="formOfertas" action="/api/guardar-oferta" method="post" th:action="@{/api/guardar-oferta}" th:object="${oferta}">
+            <div class="mb-3">
+                <label for="oferta" class="form-label">Oferta Educativa:</label>
+                <input type="hidden" th:field="*{id}"/>
+                <input type="text" class="form-control" id="oferta" th:field="*{ofertaEducativa}" placeholder="TSU o continuidad">
+                <span class="text-danger" data-th-if="${#fields.hasErrors('ofertaEducativa')}" data-th-errors="*{ofertaEducativa}">error usuario</span>
+            </div>
+
+            <div class="form-check mb-3">
+                <input type="checkbox" class="form-check-input" th:field="*{activo}" id="activoCheckbox" />
+                <label class="form-check-label" for="activoCheckbox">Activo</label>
+            </div>
+
+            <div class="mb-3">
+                <input id="new-ocupa" class="form-control"/>
+                <p></p>
+                <input type="button" class="btn btn-sm btn-primary" value="Agregar Ocupacion" onclick="agregarRenglon()"/>
+            </div>
+
+            <table class="table table-hover mx-auto">
+                <thead>
+                    <tr class="table-primary">
+                        <th class="text-center">Ocupaciones</th>
+                        <th class="text-center">Eliminar</th>
+                    </tr>
+                </thead>
+                <tbody id="tablaOcupa">
+                    <tr data-th-each="ocu:*{ocupaciones}" data-th-id="r+${ocuStat.index}">
+                        <td class="mb-8">
+                            <input name="ocupa"
+                                   id="ocupa[]"
+                                   class="form-control"
+                                   data-th-value="${ocu.ocupacion}"
+                                   />
+                            <input type="hidden" name="idOc" 
+                                   data-th-value="${ocu.id}"
+                                   />
+                        </td>
+                        <td class="mb-4">
+                            <input data-th-id="${ocuStat.index}" class="btn btn-sm btn-danger"
+                                   type="button" value="Borrar"/>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="mb-3">
+                <button type="submit" class="btn btn-success">Guardar Cambios</button>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        // Función para borrar una fila de la tabla
+        function borrarRenglon(evento) {
+            // Obtener el elemento que disparó el evento (el botón clickeado)
+            var elementoBoton = evento.target;
+            // Obtener el ID de la fila a eliminar concatenando 'r' con el ID del botón
+            var idFila = 'r' + elementoBoton.id;
+            // Eliminar la fila de la tabla
+            document.getElementById(idFila).remove();
+        }
+
+// Obtener todos los botones con la clase '.btn-danger'
+        var botonesBorrar = document.querySelectorAll('.btn-danger');
+
+// Agregar un event listener a cada botón para que llame a la función borrarRenglon() cuando se haga clic
+        for (var i = 0; i < botonesBorrar.length; i++) {
+            botonesBorrar[i].addEventListener('click', borrarRenglon);
+        }
+
+// Variable para asignar un ID único a cada nueva fila agregada
+        var idxNew = 1000;
+
+// Función para agregar una nueva fila a la tabla
+        function agregarRenglon() {
+            // Obtener el valor del input con ID 'new-ocupa'
+            var dato = document.getElementById("new-ocupa").value;
+
+            // Verificar si el valor del input no está vacío
+            if (dato !== "") {
+                // Obtener la tabla y aumentar el contador de índice único
+                const tabla = document.getElementById("tablaOcupa");
+                idxNew++;
+
+                // Crear elementos para la nueva fila
+                var elemTr = document.createElement("tr");
+                var elemTd1 = document.createElement("td");
+                var elemTd2 = document.createElement("td");
+                var newInput = document.createElement("input");
+                var newInputH = document.createElement("input");
+                var newButton = document.createElement("input");
+
+                // Configurar atributos para los elementos creados
+                newInput.setAttribute("name", "ocupa");
+                newInput.setAttribute("id", "ocupa[]");
+                newInput.setAttribute("class", "form-control");
+                newInput.setAttribute("value", dato);
+
+                newInputH.setAttribute("type", "hidden");
+                newInputH.setAttribute("name", "idOc");
+                newInputH.setAttribute("value", "0");
+
+                elemTd1.setAttribute("class", "mb-8");
+                elemTd2.setAttribute("class", "mb-4");
+
+                // Agregar los elementos a sus respectivos contenedores
+                elemTd1.appendChild(newInput);
+                elemTd1.appendChild(newInputH);
+
+                // Configurar el botón de borrado
+                newButton.addEventListener('click', borrarRenglon);
+                newButton.setAttribute("id", idxNew);
+                newButton.setAttribute("class", "btn btn-sm btn-danger");
+                newButton.setAttribute("type", "button");
+                newButton.setAttribute("value", "Borrar");
+
+                elemTd2.appendChild(newButton);
+
+                // Agregar las celdas a la fila
+                elemTr.appendChild(elemTd1);
+                elemTr.appendChild(elemTd2);
+
+                // Configurar el ID de la fila y agregarla a la tabla
+                elemTr.setAttribute("id", "r" + idxNew);
+                tabla.appendChild(elemTr);
+
+                // Limpiar el input para futuras inserciones
+                document.getElementById("new-ocupa").value = "";
+            } else {
+                // Mostrar un mensaje de alerta si no hay datos para agregar
+                alert("No hay datos para agregar");
+            }
+        }
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+
+</html>

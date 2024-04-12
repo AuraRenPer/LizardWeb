@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <title>Admisiones</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+        <style>
+            body {
+                background-color: #f8f9fa; /* Fondo gris claro */
+            }
+
+            .table-header {
+                background-color: #343a40 !important; /* Encabezado de la tabla - gris oscuro */
+                color: #ffffff; /* Texto blanco en el encabezado */
+            }
+
+            .table-bordered {
+                border: 1px solid #dee2e6; /* Borde de la tabla */
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Sombra suave */
+            }
+
+            .table-hover tbody tr:hover {
+                background-color: #f2f5f8 !important; /* Color de fondo al pasar el mouse sobre las filas */
+            }
+
+            .btn-success {
+                background-color: #34B912; /* Botones de color verde */
+                border-color: #34B912;
+            }
+
+            /* Estilos adicionales para la tabla */
+            .custom-table {
+                width: 100%;
+                border-collapse: collapse;
+                margin-top: 20px;
+            }
+
+            .custom-table th, .custom-table td {
+                padding: 12px;
+                text-align: center;
+                border: 1px solid #dee2e6;
+            }
+
+            .custom-table th {
+                background-color: #007BFF;
+                color: #ffffff;
+            }
+
+            .custom-table tbody tr:hover {
+                background-color: #f2f5f8;
+            }
+
+        </style>
+    </head>
+    <body onload="entrarAdmision()">
+        <div data-th-replace="layout/layout :: encabezado">
+        </div>
+        <div class="container-fluid">
+            <h1 class="text-center">Admisiones</h1>
+            <div class="d-flex justify-content-end mb-3" style="max-width: 90%;">
+
+                <button type="button" class="btn btn-success" onclick="AgregarAdmision()">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus-circle-fill" viewBox="0 0 16 16">
+                    <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0M8.5 4.5a.5.5 0 0 0-1 0v3h-3a.5.5 0 0 0 0 1h3v3a.5.5 0 0 0 1 0v-3h3a.5.5 0 0 0 0-1h-3z"/>
+                    </svg>
+                    Agregar
+                </button>
+            </div>
+            <table class="table table-hover table-responsive custom-table" id="table">
+                <thead>
+                    <tr class="table-header">
+                        <th>Activo</th>
+                        <th>Epoca de admisiones</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody class="table-group-divider" id="body" data-th-fragment="tbl-admision">
+                    <tr th:each="dato : ${datos}">
+                        <td class="table-checkbox">
+                            <input class="form-check-input" type="checkbox" th:checked="${dato.activo}" id="activoCheckbox" disabled>
+                        </td>
+                        <td class="col-5" th:text="${dato.nombreAdmision}"></td>
+                        <td data-sec-authorize="hasRole('ROLE_ADMIN')">
+                            <a data-th-href="@{modificarAdmision/}+${dato.id}" type="button" 
+                               class="btn btn-primary" >
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">
+                                <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>
+                                <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5z"/>
+                                </svg>                               </a>
+                            <a type="button" class="btn btn-danger" data-bs-toggle="modal" 
+                               data-th-id="${dato.id}" data-bs-target="#eliminarModal"
+                               data-th-dato="${dato.nombreAdmision}" 
+                               data-th-url="'/eliminarAdmision/'+${dato.id}" onclick="setDeleteModalData(this)">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash-fill" viewBox="0 0 16 16">
+                                <path d="M2.5 1a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1H3v9a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V4h.5a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H10a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1zm3 4a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5M8 5a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7A.5.5 0 0 1 8 5m3 .5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 1 0"/>
+                                </svg>
+                            </a>   
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Modal Eliminar-->
+        <div id="eliminarModal" class="modal fade" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Confirmar Eliminación</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p>¿Estás seguro de eliminar la admision <span id="nombreAdmision"></span>?</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <a id="href" class="btn btn-danger" href="#">Eliminar</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            function AgregarAdmision() {
+                window.location.href = "/agregarAdmision";
+            }
+            function setDeleteModalData(button) {
+                // Obtener los atributos del botón
+                var id = button.getAttribute("id");
+                var nombreAdmision = button.getAttribute("dato");
+                var url = button.getAttribute("url");
+
+                // Asignar los valores a los elementos de la modal
+                document.getElementById("nombreAdmision").innerText = nombreAdmision;
+                document.getElementById("href").setAttribute("href", url);
+            }
+        </script>
+
+        <script src="/js/admision.js"></script>
+
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+    </body>
+</html>
+
+
+
+<!--DOCTYPE html>
+<!--
+Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this template
+-->
+<!--head>
+    <title>Admisiones</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+</head-->
+<!--body onload="entrar()">
+    <div data-th-replace="layout/layout :: encabezado"></div>
+
+    <div class="container-fluid">
+        <h1 class="text-center">Admisiones</h1>
+
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal2" op="Agregar"
+                url="/guardar-admision">Agregar Admisión</button>
+
+        <table class="table table-hover table-responsive">
+            <thead>
+                <tr class="table-primary">
+                    <th>Epoca de Admisiones</th>
+                    <th class="text-center">Acciones</th>
+                </tr>
+            </thead>
+            <tbody id="tbl-admi"></tbody>
+        </table>
+    </div>
+
+    <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Eliminacion</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <label></label>
+                </div>
+                <div class="modal-footer">
+                    <a type="button" class="btn btn-secondary" data-bs-dismiss="modal" arial-label="close">Cerrar</a>
+                    <button type="submit" class="btn btn-primary" id="Aceptar">Aceptar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="exampleModal2" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form id="frm" method="post" action="#">
+                    <div class="modal-body">
+                        <input type="hidden" id="idA" name="idA" value=""/>
+                        <div class="mb-3">
+                            <label for="nombreAdmision" class="form-label">Admisión</label>
+                            <input type="text" id="nombreAdmision" name="nombreAdmision" placeholder="ene-abri" value="" class="form-control" required/>
+                        </div>
+                        <div class="mb-3">
+                            <label for="activo" class="form-check-label">Activo</label>
+                            <input class="form-check-input" id="activo" name="activo" value="" type="checkbox">
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <a type="button" class="btn btn-secondary" data-bs-dismiss="modal" arial-label="close">Cerrar</a>
+                        <button type="submit" class="btn btn-primary" id="Aceptar">Aceptar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+    <script src="/js/admisiones.js"></script>
+
+    <script>
+    const exampleModal2 = document.getElementById('exampleModal2');
+    const modalFooterButton = exampleModal2.querySelector('.modal-footer button');
+
+    exampleModal2.addEventListener('show.bs.modal', async (event) => {
+        const button = event.relatedTarget;
+        const id = button.getAttribute('id');
+        const op = button.getAttribute('op');
+
+        const modalId = exampleModal2.querySelector('#idA');
+        const modalAdmi = exampleModal2.querySelector('#nombreAdmision');
+        const modalAct = exampleModal2.querySelector('#activo');
+
+        if (op === "Editar") {
+            try {
+                const admisiones = await buscarAdmision(id);
+                console.log("este es el id alv:" + id);
+                console.log("aki ta el prro objeto: ", admisiones);
+                console.log("la pendeja opcion:" + op);
+
+                modalId.value = admisiones.id;
+                modalAdmi.value = admisiones.nombreAdmision;
+                modalAct.checked = admisiones.activo;
+            } catch (error) {
+                console.error(error);
+            }
+        } else if (op === "Agregar") {
+            modalId.value = "";
+            modalAdmi.value = "";
+            modalAct.checked = "";
+        }
+
+        // Desvincular el evento 'click' antes de agregarlo nuevamente
+        modalFooterButton.removeEventListener('click', enviarFrmAdd);
+    });
+
+    modalFooterButton.addEventListener('click', enviarFrmAdd);
+
+    //Eliminar
+    const exampleModal = document.getElementById('exampleModal');
+    const modalDeleteButton = exampleModal.querySelector('.modal-footer button');
+
+    exampleModal.addEventListener('show.bs.modal', (event) => {
+        const button = event.relatedTarget;
+        const idEliminar = button.getAttribute('id');
+        const dato = button.getAttribute('dato');
+        const op = button.getAttribute('op');
+        const url = button.getAttribute('url');
+
+        const modalTitle = exampleModal.querySelector('.modal-title');
+        const modalBodyInput = exampleModal.querySelector('.modal-body');
+        const modalFooterButton = exampleModal.querySelector('.modal-footer button');
+
+        modalTitle.textContent = `¿Está seguro de ${op}?`;
+        modalBodyInput.innerHTML = dato;
+
+        modalFooterButton.addEventListener('click', () => {
+            // Llamada a la función para manejar la eliminación
+            eliminarRegistro(idEliminar);
+        });
+    });
+    </script>
+
+</body>
+</html-->
+

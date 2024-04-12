@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Restablecer contraseña</title>
+    <!-- Enlace al archivo CSS de Bootstrap -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <style>
+        body {
+            background-color: #999EA4; /* Fondo verde claro */
+            font-family: Arial, sans-serif;
+            color: #000000; /* Letras color negro */
+        }
+        .login-container {
+            max-width: 400px; /* Ancho máximo del contenedor */
+            background-color: #ffffff; /* Contenedor blanco */
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px 0px rgba(0,0,0,0.1);
+            margin: auto;
+            padding: 20px;
+            margin-top: 150px;
+        }
+        .login-container h1 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #000000; /* Letras color negro */
+        }
+        .form-label {
+            color: #000000; /* Letras color negro */
+            font-weight: bold;
+        }
+        .form-label2{
+            color: #000000; /* Letras color negro */
+            font-weight: bold;
+        }
+        .form-control {
+            margin-bottom: 15px;
+            background-color: #ffffff; /* Fondo blanco para los inputs */
+            color: #000000; /* Letras color negro */
+        }
+        .btn-login {
+            background-color: #74A9EC; /* Botón verde claro */
+            border: none;
+            color: #ffffff; /* Letras color blanco */
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .btn-login:hover {
+            background-color: #237CEE; /* Cambio de color al pasar el mouse */
+            color: #ffffff; /* Letras color blanco */
+        }
+        .forgot-password {
+            margin-top: 10px;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="login-container">
+            <h1>Restablecer contraseña</h1>
+            <br>
+            <form method="post" action="/guardarContra" th:action="@{/guardarContra}">
+                <label for="username" class="form-label">Ingresa el token de recuperación:</label>
+                <input placeholder="Token" class="form-control" type="text" name="token" id="token"/>
+                <label for="username" class="form-label">Ingresa tu nombre de usuario:</label>
+                <input placeholder="Nombre de usuario" class="form-control" type="username" name="username" id="username"/>
+                <label for="username" class="form-label">Ingresa tu nueva contraseña:</label>
+                <input placeholder="Contraseña" class="form-control" type="password" name="contra" id="contra"/>
+                <label for="username" class="form-label">Confirma tu contraseña:</label>
+                <input placeholder="Confirmación de contraseña" class="form-control" type="password" name="contra2" id="contra2"/>
+                <center><input class="btn btn-login btn-block" type="submit" value="Restablecer"/></center> 
+            </form> 
+            <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz" crossorigin="anonymous"></script>
+        </div>
+    </div>
+</body>
+</html>
